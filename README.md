@@ -10,7 +10,6 @@ Include the script
 
 ```html
 <script src="explode.js"></script>
-
 ```
 
 
@@ -23,9 +22,10 @@ var exploder = d3.geo.explode()
                   // function new size of features in pixels
                 })
                 .align(function(d, index) {
-                  // function returning array [x, y] (in pixels)
+                  // function returning array [x, y]
+                  // which specifies the position of
+                  // the features in the svg
                 });
-
 ```
 
 Call the exploder, optionally in a transition
@@ -77,5 +77,4 @@ d3.json("us.json", function(error, us) {
             })
           );
   });
-
 ```
