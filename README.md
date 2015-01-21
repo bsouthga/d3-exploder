@@ -30,7 +30,7 @@ var exploder = d3.geo.explode()
 
 Call the exploder, optionally in a transition
 
-```
+```javascript
 var width = 960,
     height = 500,
     centered;
