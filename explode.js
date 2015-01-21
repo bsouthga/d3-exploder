@@ -92,10 +92,9 @@ d3.geo.explode = function explode() {
       return exploder;
     };
   });
-
-  exploder.version = "1.0.0";
   // return configurable exploder function
   return exploder;
 };
 
+d3.geo.explode.version = "1.0.1";
 })(d3);
