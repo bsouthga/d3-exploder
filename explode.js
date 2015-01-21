@@ -29,7 +29,7 @@ d3.geo.explode = function explode() {
 
   function exploder(selection) {
     // check for necessary parameters
-    ["size", "align", "projection"].forEach(function(option) {
+    ["size", "position", "projection"].forEach(function(option) {
       if (!config[option]) {
         throw "explode.js: " + option + " not provided to explode.";
       }
@@ -37,7 +37,7 @@ d3.geo.explode = function explode() {
     // local references to configuration
     var projection = config.projection,
         size = config.size,
-        align = config.align,
+        position = config.position,
         scale = projection.scale(),
         path = d3.geo.path().projection(projection),
         cache = {};
@@ -49,7 +49,7 @@ d3.geo.explode = function explode() {
       // setting 'd' caches the new scale which is used
       // in the transform change
       .attr('d', function(d, i) {
-        // compute size and alignment based on user functions
+        // compute size based on user functions
         var sz = size(d, i);
         // calculate new scale for projection based on desired
         // pixed size of feature
@@ -65,8 +65,8 @@ d3.geo.explode = function explode() {
       })
       // calculate new transform after finding scale
       .attr("transform", function(d, i) {
-        // compute size and alignment based on user functions
-        var A = align(d, i),
+        // compute size and positionment based on user functions
+        var A = position(d, i),
             δx = A[0],
             δy = A[1];
         // scale projection to desired size
@@ -84,7 +84,7 @@ d3.geo.explode = function explode() {
 
   // create getters / setters
   var config = {};
-  ["size", "align", "projection"].forEach(function(option) {
+  ["size", "position", "projection"].forEach(function(option) {
     config[option] = null;
     exploder[option] = function(value) {
       if (!arguments.length) return config[option];

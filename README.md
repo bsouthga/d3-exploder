@@ -21,7 +21,7 @@ var exploder = d3.geo.explode()
                 .size(function(d, i) { 
                   // function new size of features in pixels
                 })
-                .align(function(d, index) {
+                .position(function(d, index) {
                   // function returning array [x, y]
                   // which specifies the position of
                   // the features in the svg
@@ -71,7 +71,7 @@ d3.json("us.json", function(error, us) {
     states.transition()
           .duration(500)
           .call(
-            explode.align(function(d, index) {
+            explode.position(function(d, index) {
               var i = rand[index];
               return [120 + (i%10)*60, 40 + Math.floor(i/10)*60];
             })

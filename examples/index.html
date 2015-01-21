@@ -68,7 +68,7 @@
         states.transition()
               .duration(500)
               .call(
-                explode.align(function(d, index) {
+                explode.position(function(d, index) {
                   var i = rand[index];
                   return [120 + (i%10)*60, 40 + Math.floor(i/10)*60];
                 })
@@ -94,7 +94,7 @@
         states.transition()
               .duration(500)
               .call(
-                explode.align(function(d, i) { 
+                explode.position(function(d, i) { 
                   return circle(scale(i));
                 })
               );
@@ -112,7 +112,7 @@
         states.transition()
               .duration(500)
               .call(
-                explode.align(function(d, i) { 
+                explode.position(function(d, i) { 
                   return figure8(scale(i));
                 })
               );
