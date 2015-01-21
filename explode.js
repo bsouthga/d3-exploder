@@ -41,6 +41,8 @@ d3.geo.explode = function explode() {
         scale = projection.scale(),
         path = d3.geo.path().projection(projection),
         cache = {};
+    // acount for sizes given as numbers
+    size = typeof size === "function" ? size : function(){return size;};
     // move features based on configuration
     selection
       // the order of the attribute changes matters!
@@ -51,8 +53,7 @@ d3.geo.explode = function explode() {
         var sz = size(d, i);
         // calculate new scale for projection based on desired
         // pixed size of feature
-        var bounds = path.projection(projection.scale(scale))
-                         .bounds(d.feature),
+        var bounds = path.projection(projection.scale(scale)).bounds(d),
             w = bounds[1][0] - bounds[0][0],
             h = bounds[1][1] - bounds[0][1],
             sc = cache[i] = Math.min(sz / h, sz / w);
@@ -60,7 +61,7 @@ d3.geo.explode = function explode() {
         // and calculate new centroid to translate to
         path.projection(projection.scale(scale*sc));
         // return scaled path
-        return path(d.feature);
+        return path(d);
       })
       // calculate new transform after finding scale
       .attr("transform", function(d, i) {
@@ -71,7 +72,7 @@ d3.geo.explode = function explode() {
         // scale projection to desired size
         // and calculate new centroid to translate to
         path.projection(projection.scale(scale*cache[i]));
-        var coords = path.centroid(d.feature),
+        var coords = path.centroid(d),
             cx = coords[0],
             cy = coords[1];
         // return desired coordinates offset by centroid

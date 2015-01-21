@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Exploder Test</title>
+
+  <style>
+    #states path {
+      fill : #aaa;
+      stroke : #fff;
+    }
+
+    #states path:hover {
+      stroke : steelblue;
+      stroke-width: 2px;
+    }
+  </style>
+
+</head>
+<body>
+  <button id="reset">Reset</button>
+  <button id="shuffle">Random Grid</button>
+  <button id="figure8">figure 8</button>
+  <button id="circle">circle</button>
+
+  <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+  <script src="http://d3js.org/topojson.v1.min.js"></script>
+  <script src="../explode.js"></script>
+  <script>
+
+    var width = 960,
+        height = 500,
+        centered;
+
+    var projection = d3.geo.albersUsa().scale(width);
+
+    var path = d3.geo.path()
+        .projection(projection);
+
+    var svg = d3.select("body").append("svg")
+        .attr("width", width)
+        .attr("height", height);
+
+    var g = svg.append("g");
+
+
+    d3.json("us.json", function(error, us) {
+
+      var state_features = topojson.feature(us, us.objects.states).features;
+
+      var scale = d3.scale.linear()
+                    .domain([0, state_features.length])
+                    .range([0, 360]);
+
+      var states = g.append("g")
+          .attr("id", "states")
+        .selectAll("path")
+          .data(state_features)
+        .enter().append("path")
+          .attr("d", path);
+
+      var explode = d3.geo.explode()
+                      .projection(projection)
+                      .size(function(d, i) { return 40; });
+
+      d3.select("#shuffle").on('click', function() {
+        var rand = d3.shuffle(d3.range(state_features.length));
+        states.transition()
+              .duration(500)
+              .call(
+                explode.align(function(d, index) {
+                  var i = rand[index];
+                  return [120 + (i%10)*60, 40 + Math.floor(i/10)*60];
+                })
+              );
+      });
+
+      d3.select("#reset").on('click', function() {
+        states.transition()
+              .duration(500)
+              .attr("d", path)
+              .attr("transform", "translate(0,0)");
+      });
+
+
+      function circle(t) {
+        var r = height/2;
+        var x = 150 + r + r*0.8*Math.cos(t);
+        var y = r + r*0.8*Math.sin(t);
+        return [x, y];
+      }
+
+      d3.select('#circle').on('click', function(d, i) {
+        states.transition()
+              .duration(500)
+              .call(
+                explode.align(function(d, i) { 
+                  return circle(scale(i));
+                })
+              );
+      });
+
+      function figure8(t) {
+        var r = height/2;
+        var d = (1 + Math.pow(Math.sin(t), 2));
+        var x = 150 + r + (r*0.8*Math.cos(t)) / d;
+        var y = r + (r*0.8*Math.sin(t)*Math.cos(t)) / d;
+        return [x, y];
+      }
+
+      d3.select('#figure8').on('click', function(d, i) {
+        states.transition()
+              .duration(500)
+              .call(
+                explode.align(function(d, i) { 
+                  return figure8(scale(i));
+                })
+              );
+      });
+
+
+    });
+
+  </script>
+</body>
+</html>
