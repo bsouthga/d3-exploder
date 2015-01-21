@@ -4,6 +4,8 @@
 
 A tiny d3 extension which lets you turn your maps into other types of charts!
 
+[See examples here](http://bsouthga.github.io/d3-exploder/)
+
 ### Usage
 
 Include the script
