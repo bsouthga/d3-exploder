@@ -1,4 +1,4 @@
-# D3 explode
+# `d3.geo.exploder`
 
 ### Make your d3 maps explode
 
@@ -11,14 +11,14 @@ A tiny d3 extension which lets you turn your maps into other types of charts!
 Include the script
 
 ```html
-<script src="explode.js"></script>
+<script src="exploder.js"></script>
 ```
 
 
 Create an exploder function
 
 ```javascript
-var exploder = d3.geo.explode()
+var exploder = d3.geo.exploder()
                 .projection(d3.geo.albersUsa().scale(width))
                 .size(function(d, i) { 
                   // function new size of features in pixels
@@ -64,7 +64,7 @@ d3.json("us.json", function(error, us) {
     .enter().append("path")
       .attr("d", path);
 
-  var explode = d3.geo.explode()
+  var exploder = d3.geo.exploder()
                   .projection(projection)
                   .size(function(d, i) { return 40; });
 
@@ -73,7 +73,7 @@ d3.json("us.json", function(error, us) {
     states.transition()
           .duration(500)
           .call(
-            explode.position(function(d, index) {
+            exploder.position(function(d, index) {
               var i = rand[index];
               return [120 + (i%10)*60, 40 + Math.floor(i/10)*60];
             })
