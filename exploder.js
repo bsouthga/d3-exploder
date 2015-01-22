@@ -1,5 +1,5 @@
 /*
-  D3 Explode! extension
+  D3 Exploder! extension
   Ben Southgate
 
   Copyright (c) 2015 Benjamin Southgate
@@ -25,13 +25,13 @@
 
 ;(function(d3) {
 
-d3.geo.explode = function explode() {
+d3.geo.exploder = function exploder() {
 
-  function exploder(selection) {
+  function explode(selection) {
     // check for necessary parameters
     ["size", "position", "projection"].forEach(function(option) {
       if (!config[option]) {
-        throw "explode.js: " + option + " not provided to explode.";
+        throw "exploder.js: " + option + " not provided to exploder.";
       }
     });
     // local references to configuration
@@ -86,16 +86,15 @@ d3.geo.explode = function explode() {
   var config = {};
   ["size", "position", "projection"].forEach(function(option) {
     config[option] = null;
-    exploder[option] = function(value) {
+    explode[option] = function(value) {
       if (!arguments.length) return config[option];
       config[option] = value;
-      return exploder;
+      return explode;
     };
   });
-
-  exploder.version = "1.0.0";
   // return configurable exploder function
-  return exploder;
+  return explode;
 };
 
+d3.geo.exploder.version = "1.0.2";
 })(d3);
