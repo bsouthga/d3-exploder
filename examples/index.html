@@ -5,51 +5,145 @@
   <title>Exploder Test</title>
 
   <style>
-    #states path {
-      fill : #aaa;
-      stroke : #fff;
+    html, body {
+      font-family: Arial, Helvetica, sans-serif;
+      text-align: center;
     }
 
-    #states path:hover {
-      fill: orange;
+    h1,h2,h3,h4,h5 {
+      font-weight: normal;
     }
+
+    h1:not(#title) {
+      border-bottom: 1px solid #ccc;
+      margin-top: 50px;
+    }
+
+    a {
+      color: #000;
+      text-decoration: underline;
+    }
+
+    #states path {
+      fill : #000;
+      stroke : #fff;
+    }
+    #states path:hover {
+      fill: red;
+    }
+
+    #map {
+      width : 960px;
+      height: 500px;
+      margin-left: -180px;
+      display: block;
+    }
+
+    #buttons {
+      width : 400px;
+      margin: 0 auto;
+      display: block;
+      text-align: center;
+    }
+
+    h1 pre {
+      text-align: center;
+    }
+
+    #content {
+      width: 600px;
+      display: block;
+      text-align: left;
+      margin: 50px auto;
+      margin-bottom: 100px;
+    }
+
+  .axis path,
+  .axis line {
+    fill: none;
+    stroke: #000;
+    shape-rendering: crispEdges;
+  }
   </style>
 
 </head>
 <body>
-  <button id="reset">Reset</button>
-  <button id="shuffle">Random Grid</button>
-  <button id="circle">circle</button>
-  <button id="figure8">figure 8</button>
+  <div id="content">
+    <div id="buttons"></div>
+    <div id="map"></div>
+  </div>
 
-  <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
-  <script src="http://d3js.org/topojson.v1.min.js"></script>
-  <script src="../explode.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.3/d3.min.js" charset="utf-8"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/topojson/1.6.9/topojson.min.js"></script>
+  <script src="../exploder.js"></script>
   <script>
 
-    var width = 960,
-        height = 500,
-        centered;
+    var margin = {top: 20, right: 20, bottom: 30, left: 40},
+        width = 960 - margin.left - margin.right,
+        height = 500 - margin.top - margin.bottom,
+        centered,
+        animation;
 
     var projection = d3.geo.albersUsa().scale(width);
 
     var path = d3.geo.path()
         .projection(projection);
 
-    var svg = d3.select("body").append("svg")
-        .attr("width", width)
-        .attr("height", height);
-
-    var g = svg.append("g");
+    var svg = d3.select("#map").append("svg")
+      .attr("width", width + margin.left + margin.right)
+      .attr("height", height + margin.top + margin.bottom)
+    .append("g")
+      .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
 
     d3.json("us.json", function(error, us) {
 
       var state_features = topojson.feature(us, us.objects.states).features;
 
+      var feature_domain = [0, state_features.length-1];
+
+      // setup x 
+      var xScale = d3.scale.linear().range([0, width]).domain(feature_domain), // value -> display
+          xAxis = d3.svg.axis().scale(xScale).orient("bottom");
+
+      // setup y
+      var yScale = d3.scale.linear().range([height, 0]).domain(feature_domain), // value -> display
+          yAxis = d3.svg.axis().scale(yScale).orient("left");
+
+      // x-axis
+      var x_axis_g = svg.append("g")
+          .attr("class", "x axis")
+          .attr("transform", "translate(0," + (height) + ")")
+          .call(xAxis).style('opacity', 0);
+
+      x_axis_g.append("text")
+          .attr("class", "label")
+          .attr("x", width)
+          .attr("y", -6)
+          .style("text-anchor", "end")
+          .text("Random X variable");
+
+      // y-axis
+      var y_axis_g = svg.append("g")
+          .attr("class", "y axis")
+          .call(yAxis)
+          .style('opacity', 0);
+
+      y_axis_g.append("text")
+          .attr("class", "label")
+          .attr("transform", "rotate(-90)")
+          .attr("y", 6)
+          .attr("dy", ".71em")
+          .style("text-anchor", "end")
+          .text("Random Y variable");
+
+
+      var g = svg.append("g");
+
+
       var scale = d3.scale.linear()
-                    .domain([0, state_features.length])
-                    .range([0, 360]);
+                    .domain(feature_domain)
+                    .range([0, Math.PI*2]);
 
       var states = g.append("g")
           .attr("id", "states")
@@ -58,23 +152,159 @@
         .enter().append("path")
           .attr("d", path);
 
-      var explode = d3.geo.explode()
+      var default_size = function(d, i) { return 40; };
+      var exploder = d3.geo.exploder()
                       .projection(projection)
-                      .size(function(d, i) { return 40; });
+                      .size(default_size);
 
-      d3.select("#shuffle").on('click', function() {
+
+
+      function addButton(text, callback) {
+        d3.select("#buttons").append('button')
+          .text(text)
+          .on('click', function() {
+            // clear running animation
+            animation = clearTimeout(animation);
+            // hide axis
+            x_axis_g.transition().duration(500).style('opacity', 0);
+            y_axis_g.transition().duration(500).style('opacity', 0);
+            // reset to default size
+            exploder.size(default_size);
+            callback.call(this);
+          })
+      }
+
+      // --------------------------
+      //
+      // randomly ordered grid
+      //
+      // --------------------------
+      addButton('random grid', function() {
         var rand = d3.shuffle(d3.range(state_features.length));
         states.transition()
               .duration(500)
               .call(
-                explode.position(function(d, index) {
+                exploder.position(function(d, index) {
                   var i = rand[index];
-                  return [120 + (i%10)*60, 40 + Math.floor(i/10)*60];
+                  var px = Math.max(0, width - 9*60)/2
+                  return [px + (i%10)*60, 70 + Math.floor(i/10)*60];
                 })
               );
       });
 
-      d3.select("#reset").on('click', function() {
+
+      // --------------------------
+      //
+      // Circle Plot
+      //
+      // --------------------------
+      function circle(d, i) {
+        var t = scale(i);
+        var r = (height/2)*.8;
+        var x = width/2 + r*Math.cos(t);
+        var y = height/2 + r*Math.sin(t);
+        return [x, y];
+      }
+      addButton('circle', function(d, i) {
+        states.transition()
+              .duration(500)
+              .call(exploder.position(circle));
+      });
+
+
+      // --------------------------
+      //
+      // Figure 8 plot
+      //
+      // --------------------------
+      function figure8(d, i) {
+        var t = scale(i);
+        var r = (height/2)*.8;
+        var d = (1 + Math.pow(Math.sin(t), 2));
+        var x = width/2 + (r*Math.cos(t)) / d;
+        var y = height/2 + (r*Math.sin(t)*Math.cos(t)) / d;
+        return [x, y];
+      }
+      addButton('figure 8 animated', function() {
+        var advance = 1;
+        function tick() {
+          states
+            .transition()
+            .duration(500)
+            .call(exploder.position(function(d, i) {
+              return figure8(d, i + advance++);
+            }));
+        }
+        animation = setInterval(tick, 550)
+        tick();
+      });
+
+
+
+      // --------------------------
+      //
+      // spiral Plot
+      //
+      // --------------------------
+      var spiral_scale = d3.scale.linear()
+                       .domain(feature_domain)
+                       .range([0, 50000]);
+      var size_scale = d3.scale.linear()
+                        .domain(feature_domain)
+                        .range([10, 100]);
+
+      function spiral(d, i) {
+        var t = spiral_scale(i);
+        var x = width/2 + Math.pow(t, 1/2)*Math.cos(t);
+        var y = height/2 + Math.pow(t, 1/2)*Math.sin(t);
+        return [x, y];
+      }
+      addButton('spiral', function(d, i) {
+        states.transition()
+              .duration(500)
+              .call(
+                exploder
+                  .position(spiral)
+                  .size(function(d, i) {
+                    return size_scale(i);
+                  })
+              );
+      });
+
+
+
+      // --------------------------
+      //
+      // Scatter Plot
+      //
+      // --------------------------
+      addButton('scatter', function(d, i) {
+
+
+        // hide axis
+        x_axis_g.transition().duration(500).style('opacity', 1);
+        y_axis_g.transition().duration(500).style('opacity', 1);
+
+        states.transition()
+              .duration(500)
+              .call(
+                exploder.position(function(d, i) {
+                  var x = xScale(i) + (-0.5 + Math.random())*70;
+                  var y = yScale(i) + (-0.5 + Math.random())*70;
+                  return [x, y];
+                })
+              );
+
+      });
+
+
+
+      // --------------------------
+      //
+      // realign map
+      //
+      // --------------------------
+      addButton('reset', function() {
         states.transition()
               .duration(500)
               .attr("d", path)
@@ -82,44 +312,7 @@
       });
 
 
-      function circle(t) {
-        var r = height/2;
-        var x = 150 + r + r*0.8*Math.cos(t);
-        var y = r + r*0.8*Math.sin(t);
-        return [x, y];
-      }
-
-      d3.select('#circle').on('click', function(d, i) {
-        states.transition()
-              .duration(500)
-              .call(
-                explode.position(function(d, i) { 
-                  return circle(scale(i));
-                })
-              );
-      });
-
-      function figure8(t) {
-        var r = height/2;
-        var d = (1 + Math.pow(Math.sin(t), 2));
-        var x = 150 + r + (r*0.8*Math.cos(t)) / d;
-        var y = r + (r*0.8*Math.sin(t)*Math.cos(t)) / d;
-        return [x, y];
-      }
-
-      d3.select('#figure8').on('click', function(d, i) {
-        states.transition()
-              .duration(500)
-              .call(
-                explode.position(function(d, i) { 
-                  return figure8(scale(i));
-                })
-              );
-      });
-
-
     });
-
   </script>
 </body>
 </html>

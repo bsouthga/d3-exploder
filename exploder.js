@@ -22,14 +22,15 @@
   OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
   THE SOFTWARE.
 */
-
-;(function(d3) {
+(function(d3) {
 
 d3.geo.exploder = function exploder() {
-
+  // attributes / methods for explode
+  var methods = ["size", "position", "projection"];
+  // explode selection
   function explode(selection) {
     // check for necessary parameters
-    ["size", "position", "projection"].forEach(function(option) {
+    methods.forEach(function(option) {
       if (!config[option]) {
         throw "exploder.js: " + option + " not provided to exploder.";
       }
@@ -41,8 +42,6 @@ d3.geo.exploder = function exploder() {
         scale = projection.scale(),
         path = d3.geo.path().projection(projection),
         cache = {};
-    // acount for sizes given as numbers
-    size = typeof size === "function" ? size : function(){return size;};
     // move features based on configuration
     selection
       // the order of the attribute changes matters!
@@ -65,29 +64,27 @@ d3.geo.exploder = function exploder() {
       })
       // calculate new transform after finding scale
       .attr("transform", function(d, i) {
-        // compute size and positionment based on user functions
-        var A = position(d, i),
-            δx = A[0],
-            δy = A[1];
         // scale projection to desired size
         // and calculate new centroid to translate to
         path.projection(projection.scale(scale*cache[i]));
-        var coords = path.centroid(d),
-            cx = coords[0],
-            cy = coords[1];
+        var C = path.centroid(d),
+            // compute size and positionment based on user functions
+            A = position(d, i);
         // return desired coordinates offset by centroid
-        return "translate(" + [δx - cx, δy - cy] + ")";
+        return "translate(" + [A[0] - C[0], A[1] - C[1]] + ")";
     });
     // reset scale for projection
     projection.scale(scale);
   }
-
   // create getters / setters
   var config = {};
-  ["size", "position", "projection"].forEach(function(option) {
+  methods.forEach(function(option) {
     config[option] = null;
     explode[option] = function(value) {
       if (!arguments.length) return config[option];
+      if (!(value instanceof "function")) {
+        throw "exploder.js: " + option + " needs to be a function.";
+      }
       config[option] = value;
       return explode;
     };
@@ -95,6 +92,6 @@ d3.geo.exploder = function exploder() {
   // return configurable exploder function
   return explode;
 };
-
-d3.geo.exploder.version = "1.0.2";
+// semantic version
+d3.geo.exploder.version = "1.0.3";
 })(d3);
