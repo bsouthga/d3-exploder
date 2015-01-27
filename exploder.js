@@ -26,7 +26,9 @@
 
 d3.geo.exploder = function exploder() {
   // attributes / methods for explode
-  var methods = ["size", "position", "projection"];
+  var methods = ["size", "position", "projection"],
+      // no need to initialize path each time expode is called
+      path = d3.geo.path();
   // explode selection
   function explode(selection) {
     // check for necessary parameters
@@ -40,8 +42,9 @@ d3.geo.exploder = function exploder() {
         size = config.size,
         position = config.position,
         scale = projection.scale(),
-        path = d3.geo.path().projection(projection),
         cache = {};
+    // update projection of path function
+    path.projection(projection);
     // move features based on configuration
     selection
       // the order of the attribute changes matters!
@@ -82,7 +85,7 @@ d3.geo.exploder = function exploder() {
     config[option] = null;
     explode[option] = function(value) {
       if (!arguments.length) return config[option];
-      if (!(value instanceof "function")) {
+      if (!(value instanceof Function)) {
         throw "exploder.js: " + option + " needs to be a function.";
       }
       config[option] = value;
@@ -93,5 +96,5 @@ d3.geo.exploder = function exploder() {
   return explode;
 };
 // semantic version
-d3.geo.exploder.version = "1.0.3";
+d3.geo.exploder.version = "1.0.4";
 })(d3);
