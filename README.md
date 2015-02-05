@@ -8,10 +8,15 @@ A tiny d3 extension which lets you turn your maps into other types of charts!
 
 ### Usage
 
-Include the script
+Include the script, or require in node and extend d3
 
 ```html
 <script src="exploder.js"></script>
+```
+
+```javascript
+var d3 = require('d3');
+require('./exploder.js')(d3);
 ```
 
 

@@ -23,14 +23,14 @@
   THE SOFTWARE.
 */
 
-(function(d3) {
-
+(function(wrapper) {
 
 function exploder() {
 
   // attributes / methods for explode
   var methods = ["size", "position", "projection"],
-      path = d3.geo.path();
+      // call d3.geo.path()
+      path = this.path();
 
   // explode selection
   function explode(selection) {
@@ -101,9 +101,30 @@ function exploder() {
   return explode;
 }
 
-
 // semantic version
-exploder.version = "1.0.4";
-d3.geo.exploder = exploder;
+exploder.version = "1.0.5";
 
-})(d3);
+// add exploder to d3 or to the module exports
+wrapper(exploder);
+
+})(function(exploder){
+
+  if (typeof d3 !== 'undefined') {
+    d3.geo.exploder = exploder;
+  }
+
+  // if requiring in nodeJS,
+  // expose exploder via extending function
+  // USAGE:
+  //   var d3 = require('d3');
+  //   require('./exploder.js')(d3);
+  // OR:
+  //  var d3 = require('./exploder.js')(require('d3'))
+  if ((typeof module != 'undefined') && (module.exports)) {
+    module.exports = function(d3) {
+      d3.geo.exploder = exploder;
+      return d3;
+    };
+  }
+
+});
