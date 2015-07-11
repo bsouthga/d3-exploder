@@ -8,6 +8,20 @@ A tiny d3 extension which lets you turn your maps into other types of charts!
 
 [Another example brought up by a user](http://jsfiddle.net/9Lpcm56n/2/)
 
+
+### Installation
+
+`d3-exploder` can be installed via `bower` or `npm`
+
+```
+npm install d3-exploder
+```
+
+```
+bower install d3-exploder
+```
+
+
 ### Usage
 
 Include the script, or require in node and extend d3
@@ -27,7 +41,7 @@ Create an exploder function
 ```javascript
 var exploder = d3.geo.exploder()
                 .projection(d3.geo.albersUsa().scale(width))
-                .size(function(d, i) { 
+                .size(function(d, i) {
                   // function new size of features in pixels
                 })
                 .position(function(d, index) {
