@@ -1,11 +1,1 @@
-d3-explode.sublime-project
-d3-explode.sublime-workspace
-app/*
-bower_components/*
-dist/*
 node_modules/*
-bower.json
-Gruntfile.coffee
-mapexplode.sublime-project
-mapexplode.sublime-workspace
-package.json

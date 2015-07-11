@@ -1,0 +1,29 @@
+{
+  "name": "d3-exploder",
+  "version": "1.0.5",
+  "homepage": "http://bsouthga.github.io/d3-exploder/",
+  "authors": [
+    "Ben Southgate <bsouthga@gmail.com>"
+  ],
+  "description": "A tiny d3 extension which lets you turn your maps into other types of charts!",
+  "main": "exploder.min.js",
+  "moduleType": [
+    "globals",
+    "node"
+  ],
+  "keywords": [
+    "d3",
+    "exploder",
+    "d3-exploder",
+    "maps",
+    "svg"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ]
+}
