@@ -7,7 +7,8 @@
   "module": "index.js",
   "scripts": {
     "build": "rollup -f umd -n d3 -g d3-geo:d3 -o build/d3-exploder.js -- index.js && cp ./build/d3-exploder.js ./docs/d3-exploder.js",
-    "minify": "uglifyjs --preamble \"$(preamble)\" build/d3-exploder.js -c negate_iife=false -m -o build/d3-exploder.min.js"
+    "minify": "uglifyjs --preamble \"$(preamble)\" build/d3-exploder.js -c negate_iife=false -m -o build/d3-exploder.min.js",
+    "prepublish": "npm run build && npm run minify"
   },
   "author": {
     "name": "Ben Southgate",

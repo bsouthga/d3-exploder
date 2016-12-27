@@ -1,4 +1,4 @@
-# `d3.geo.exploder`
+# `d3-exploder`
 
 ### Make your d3 maps explode
 
