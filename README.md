@@ -11,35 +11,27 @@ A tiny d3 extension which lets you turn your maps into other types of charts!
 
 ### Installation
 
-`d3-exploder` can be installed via `bower` or `npm`
+`d3-exploder` can be installed via `npm`
 
 ```
 npm install d3-exploder
 ```
 
-```
-bower install d3-exploder
-```
+**Note:**
 
+d3-exploder >= 2.0.0 supports d3 v4. For use with d3 v3, install version 1 of d3-exploder.
 
 ### Usage
 
-Include the script, or require in node and extend d3
-
-```html
-<script src="exploder.js"></script>
-```
 
 ```javascript
-var d3 = require('d3');
-require('./exploder.js')(d3);
-```
+import * as d3 from 'd3';
+import { exploder } from 'd3-exploder';
 
 
-Create an exploder function
 
-```javascript
-var exploder = d3.geo.exploder()
+// Create an exploder function
+var exploder = exploder()
                 .projection(d3.geo.albersUsa().scale(width))
                 .size(function(d, i) {
                   // function new size of features in pixels
@@ -49,18 +41,16 @@ var exploder = d3.geo.exploder()
                   // which specifies the position of
                   // the features in the svg
                 });
-```
 
-Call the exploder, optionally in a transition
+// Call exploder, optionally in a transition
 
-```javascript
 var width = 960,
     height = 500,
     centered;
 
-var projection = d3.geo.albersUsa().scale(width);
+var projection = d3.geoAlbersUsa().scale(width);
 
-var path = d3.geo.path()
+var path = d3.geoPath()
     .projection(projection);
 
 var svg = d3.select("body").append("svg")
@@ -74,7 +64,7 @@ d3.json("us.json", function(error, us) {
 
   var state_features = topojson.feature(us, us.objects.states).features;
 
-  var scale = d3.scale.linear()
+  var scale = d3.scaleLinear()
                 .domain([0, state_features.length])
                 .range([0, 360]);
 
@@ -85,7 +75,7 @@ d3.json("us.json", function(error, us) {
     .enter().append("path")
       .attr("d", path);
 
-  var exploder = d3.geo.exploder()
+  var exploder = d3.exploder()
                   .projection(projection)
                   .size(function(d, i) { return 40; });
 

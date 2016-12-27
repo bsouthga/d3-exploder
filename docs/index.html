@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>d3-exploder</title>
+
+  <style>
+
+    html, body {
+      font-family: Arial, Helvetica, sans-serif;
+      text-align: center;
+    }
+
+    h1,h2,h3,h4,h5 {
+      font-weight: normal;
+    }
+
+    h1:not(#title) {
+      border-bottom: 1px solid #ccc;
+      margin-top: 50px;
+    }
+
+    a {
+      color: #000;
+      text-decoration: underline;
+    }
+
+    #states path {
+      fill : #000;
+      stroke : #fff;
+    }
+    #states path:hover {
+      fill: red;
+    }
+
+    #map {
+      width : 960px;
+      height: 500px;
+      margin-left: -180px;
+      display: block;
+    }
+
+    #buttons {
+      width : 400px;
+      margin: 0 auto;
+      display: block;
+      text-align: center;
+    }
+
+    h1 pre {
+      text-align: center;
+    }
+
+    #bomb {
+      width: 100%;
+      text-align: center;
+      display: block;
+    }
+
+    #content {
+      width: 600px;
+      display: block;
+      text-align: left;
+      margin: 50px auto;
+      margin-bottom: 100px;
+    }
+
+    #footer {
+      width : 100%;
+      display: block;
+      text-align: center;
+      border-top: 1px solid #ccc;
+      padding-top: 10px;
+      font-size: 12px;
+    }
+
+  .axis path,
+  .axis line {
+    fill: none;
+    stroke: #000;
+    shape-rendering: crispEdges;
+  }
+
+  </style>
+
+</head>
+<body>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.4/styles/default.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.4/highlight.min.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script>
+
+  <a href="https://github.com/bsouthga/d3-exploder"><img style="position: absolute; top: 0; left: 0; border: 0;" src="https://camo.githubusercontent.com/567c3a48d796e2fc06ea80409cc9dd82bf714434/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f6c6566745f6461726b626c75655f3132313632312e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_left_darkblue_121621.png"></a>
+
+  <div id="content">
+
+    <a href="https://github.com/bsouthga/d3-exploder" id="bomb"><img src="bomb7.svg" alt="view on github"/></a>
+    <h1 id="title"><pre>d3-exploder</pre></h1>
+
+    <div id="buttons"></div>
+    <div id="map"></div>
+
+    <h1>What is this?</h1>
+
+    <p>
+      This is a tiny (0.8KB-ish) d3 extension that lets you easily move and resize geographic features rendered with d3 and topojson.
+    </p>
+
+    <h1>Why would I want this?</h1>
+
+    <p>
+      Say you have a map of the US (like above) and you want to gratuitously transition the map into a scatter plot where the states are the points. This will let you do that. To see this in action, click the "scatter" button above.
+    </p>
+
+    <h1>How can I use this?</h1>
+
+    You can install via...
+
+    <pre>
+      <code class="shell">npm install d3-exploder</code>
+    </pre>
+
+    And then import within javascript
+    <pre>
+      <code class="javascript">import { exploder } from 'd3-exploder';
+
+var myExploder = exploder();</code>
+    </pre>
+
+    <p>or include via a script tag</p>
+
+  <pre>
+    <code class="html">&lt;script src=&quot;http://d3js.org/d3.v4.min.js&quot; charset=&quot;utf-8&quot;&gt;&lt;/script&gt;
+&lt;script src=&quot;http://d3js.org/topojson.v2.min.js&quot;&gt;&lt;/script&gt;
+&lt;script src=&quot;d3-exploder.min.js&quot;&gt;&lt;/script&gt;</code>
+  </pre>
+
+  Next, create a map with some geographic features... and then create an exploder function and call it!
+
+  <pre>
+    <code class="javascript">
+var width = 960,
+    height = 500;
+
+var projection = d3.geoAlbersUsa().scale(width);
+
+var path = d3.geoPath()
+    .projection(projection);
+
+var svg = d3.select("#map").append("svg")
+    .attr("width", width)
+    .attr("height", height);
+
+var g = svg.append("g");
+
+
+d3.json("us.json", function(error, us) {
+
+  var state_features = topojson.feature(
+    us, us.objects.states
+  ).features;
+
+  var states = g.append("g")
+      .attr("id", "states")
+    .selectAll("path")
+      .data(state_features)
+    .enter().append("path")
+      .attr("d", path);
+
+
+  // Here is the magic!
+  // This exploder will create a grid of the states
+  // when called on a featurelist selection
+  var exploder = d3.exploder()
+                  // use the same projection as the map
+                  .projection(projection)
+                  // provide a function to determine the size
+                  // of each feature when called
+                  .size(function(d, i) { return 40; })
+                  // provide a function to determine the
+                  // new (grid) positions of the features
+                  // -> returns an [x, y] array (in pixels)
+                  .position(function(d, i) {
+                    var px = Math.max(0, width - 9*60)/2
+                    return [px + (i%10)*60, 70 + Math.floor(i/10)*60];
+                  })
+  //
+  // transition to the grid
+  //
+  states
+    .transition()
+    .duration(500)
+    .call(exploder);
+
+});
+    </code>
+  </pre>
+
+  <div id="footer">2015 | <a href="http://bsou.io">Ben Southgate</a></div>
+
+  </div>
+
+
+  <script src="http://d3js.org/d3.v4.min.js" charset="utf-8"></script>
+  <script src="http://d3js.org/topojson.v2.min.js"></script>
+  <script src="./d3-exploder.js"></script>
+  <script>
+
+    var margin = {top: 20, right: 20, bottom: 30, left: 40},
+        width = 960 - margin.left - margin.right,
+        height = 500 - margin.top - margin.bottom,
+        centered,
+        animation;
+
+    var projection = d3.geoAlbersUsa().scale(width);
+
+    var path = d3.geoPath()
+        .projection(projection);
+
+    var svg = d3.select("#map").append("svg")
+      .attr("width", width + margin.left + margin.right)
+      .attr("height", height + margin.top + margin.bottom)
+    .append("g")
+      .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+
+
+
+    d3.json("us.json", function(error, us) {
+
+      var state_features = topojson.feature(us, us.objects.states).features;
+
+      var feature_domain = [0, state_features.length-1];
+
+      // setup x
+      var xScale = d3.scaleLinear().range([0, width]).domain(feature_domain), // value -> display
+          xAxis = d3.axisBottom().scale(xScale);
+
+      // setup y
+      var yScale = d3.scaleLinear().range([height, 0]).domain(feature_domain), // value -> display
+          yAxis = d3.axisLeft().scale(yScale);
+
+      // x-axis
+      var x_axis_g = svg.append("g")
+          .attr("class", "x axis")
+          .attr("transform", "translate(0," + (height) + ")")
+          .call(xAxis).style('opacity', 0);
+
+      x_axis_g.append("text")
+          .attr("class", "label")
+          .attr("x", width)
+          .attr("y", -6)
+          .style("text-anchor", "end")
+          .text("Random X variable");
+
+      // y-axis
+      var y_axis_g = svg.append("g")
+          .attr("class", "y axis")
+          .call(yAxis)
+          .style('opacity', 0);
+
+      y_axis_g.append("text")
+          .attr("class", "label")
+          .attr("transform", "rotate(-90)")
+          .attr("y", 6)
+          .attr("dy", ".71em")
+          .style("text-anchor", "end")
+          .text("Random Y variable");
+
+
+      var g = svg.append("g");
+
+
+      var scale = d3.scaleLinear()
+                    .domain(feature_domain)
+                    .range([0, Math.PI*2]);
+
+      var states = g.append("g")
+          .attr("id", "states")
+        .selectAll("path")
+          .data(state_features)
+        .enter().append("path")
+          .attr("d", path);
+
+      var default_size = function(d, i) { return 40; };
+      var exploder = d3.exploder()
+                      .projection(projection)
+                      .size(default_size);
+
+
+
+      function addButton(text, callback) {
+        d3.select("#buttons").append('button')
+          .text(text)
+          .on('click', function() {
+            // clear running animation
+            animation = clearTimeout(animation);
+            // hide axis
+            x_axis_g.transition().duration(500).style('opacity', 0);
+            y_axis_g.transition().duration(500).style('opacity', 0);
+            // reset to default size
+            exploder.size(default_size);
+            callback.call(this);
+          })
+      }
+
+      // --------------------------
+      //
+      // randomly ordered grid
+      //
+      // --------------------------
+      addButton('random grid', function() {
+        var rand = d3.shuffle(d3.range(state_features.length));
+        states.transition()
+              .duration(500)
+              .call(
+                exploder.position(function(d, index) {
+                  var i = rand[index];
+                  var px = Math.max(0, width - 9*60)/2
+                  return [px + (i%10)*60, 70 + Math.floor(i/10)*60];
+                })
+              );
+      });
+
+
+      // --------------------------
+      //
+      // Circle Plot
+      //
+      // --------------------------
+      function circle(d, i) {
+        var t = scale(i);
+        var r = (height/2)*.8;
+        var x = width/2 + r*Math.cos(t);
+        var y = height/2 + r*Math.sin(t);
+        return [x, y];
+      }
+      addButton('circle', function(d, i) {
+        states.transition()
+              .duration(500)
+              .call(exploder.position(circle));
+      });
+
+
+      // --------------------------
+      //
+      // Figure 8 plot
+      //
+      // --------------------------
+      function figure8(d, i) {
+        var t = scale(i);
+        var r = (height/2)*.8;
+        var d = (1 + Math.pow(Math.sin(t), 2));
+        var x = width/2 + (r*Math.cos(t)) / d;
+        var y = height/2 + (r*Math.sin(t)*Math.cos(t)) / d;
+        return [x, y];
+      }
+      addButton('figure 8 animated', function() {
+        var advance = 1;
+        function tick() {
+          states
+            .transition()
+            .duration(500)
+            .call(exploder.position(function(d, i) {
+              return figure8(d, i + advance++);
+            }));
+        }
+        animation = setInterval(tick, 550)
+        tick();
+      });
+
+
+
+      // --------------------------
+      //
+      // spiral Plot
+      //
+      // --------------------------
+      var spiral_scale = d3.scaleLinear()
+                       .domain(feature_domain)
+                       .range([0, 50000]);
+      var size_scale = d3.scaleLinear()
+                        .domain(feature_domain)
+                        .range([10, 100]);
+
+      function spiral(d, i) {
+        var t = spiral_scale(i);
+        var x = width/2 + Math.pow(t, 1/2)*Math.cos(t);
+        var y = height/2 + Math.pow(t, 1/2)*Math.sin(t);
+        return [x, y];
+      }
+      addButton('spiral', function(d, i) {
+        states.transition()
+              .duration(500)
+              .call(
+                exploder
+                  .position(spiral)
+                  .size(function(d, i) {
+                    return size_scale(i);
+                  })
+              );
+      });
+
+
+
+      // --------------------------
+      //
+      // Scatter Plot
+      //
+      // --------------------------
+      addButton('scatter', function(d, i) {
+
+
+        // hide axis
+        x_axis_g.transition().duration(500).style('opacity', 1);
+        y_axis_g.transition().duration(500).style('opacity', 1);
+
+        states.transition()
+              .duration(500)
+              .call(
+                exploder.position(function(d, i) {
+                  var x = xScale(i) + (-0.5 + Math.random())*70;
+                  var y = yScale(i) + (-0.5 + Math.random())*70;
+                  return [x, y];
+                })
+              );
+
+      });
+
+
+
+      // --------------------------
+      //
+      // realign map
+      //
+      // --------------------------
+      addButton('reset', function() {
+        states.transition()
+              .duration(500)
+              .attr("d", path)
+              .attr("transform", "translate(0,0)");
+      });
+
+
+    });
+  </script>
+</body>
+</html>

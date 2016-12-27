@@ -1,0 +1,1 @@
+export { exploder, version } from './src/exploder';
