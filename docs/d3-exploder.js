@@ -1,7 +1,10 @@
-import { geoPath } from 'd3-geo';
+(function (global, factory) {
+  typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('d3-geo')) :
+  typeof define === 'function' && define.amd ? define(['exports', 'd3-geo'], factory) :
+  (factory((global.d3 = global.d3 || {}),global.d3));
+}(this, (function (exports,d3Geo) { 'use strict';
 
-
-export var version = '2.0.0';
+var version = '2.0.0';
 
 
 /**
@@ -19,10 +22,10 @@ function error(message) {
 }
 
 
-export function exploder() {
+function exploder() {
 
 
-  var path = geoPath();
+  var path = d3Geo.geoPath();
 
 
   // create getters / setters
@@ -68,7 +71,7 @@ export function exploder() {
 
         // calculate new scale for projection based on desired
         // pixel size of feature
-        projection.scale(scale)
+        projection.scale(scale);
 
         var bounds = path.bounds(d);
         var w = bounds[1][0] - bounds[0][0];
@@ -103,3 +106,9 @@ export function exploder() {
   return explode;
 }
 
+exports.exploder = exploder;
+exports.version = version;
+
+Object.defineProperty(exports, '__esModule', { value: true });
+
+})));
