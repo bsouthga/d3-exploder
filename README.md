@@ -1,5 +1,7 @@
 # `d3-exploder`
 
+[![npm version](https://badge.fury.io/js/d3-exploder.svg)](https://badge.fury.io/js/d3-exploder)
+
 ### Make your d3 maps explode
 
 A tiny d3 extension which lets you turn your maps into other types of charts!
