@@ -17,6 +17,10 @@ A tiny d3 extension which lets you turn your maps into other types of charts!
 npm install d3-exploder
 ```
 
+**Note:**
+
+d3-exploder >= 2.0.0 supports d3 v4. For use with d3 v3, install version 1 of d3-exploder.
+
 ### Usage
 
 
@@ -44,9 +48,9 @@ var width = 960,
     height = 500,
     centered;
 
-var projection = d3.geo.albersUsa().scale(width);
+var projection = d3.geoAlbersUsa().scale(width);
 
-var path = d3.geo.path()
+var path = d3.geoPath()
     .projection(projection);
 
 var svg = d3.select("body").append("svg")
@@ -60,7 +64,7 @@ d3.json("us.json", function(error, us) {
 
   var state_features = topojson.feature(us, us.objects.states).features;
 
-  var scale = d3.scale.linear()
+  var scale = d3.scaleLinear()
                 .domain([0, state_features.length])
                 .range([0, 360]);
 
@@ -71,7 +75,7 @@ d3.json("us.json", function(error, us) {
     .enter().append("path")
       .attr("d", path);
 
-  var exploder = d3.geo.exploder()
+  var exploder = d3.exploder()
                   .projection(projection)
                   .size(function(d, i) { return 40; });
 
