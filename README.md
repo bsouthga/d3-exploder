@@ -34,7 +34,7 @@ import { exploder } from 'd3-exploder';
 
 // Create an exploder function
 var exploder = exploder()
-                .projection(d3.geo.albersUsa().scale(width))
+                .projection(d3.geoAlbersUsa().scale(width))
                 .size(function(d, i) {
                   // function new size of features in pixels
                 })
