@@ -11,35 +11,23 @@ A tiny d3 extension which lets you turn your maps into other types of charts!
 
 ### Installation
 
-`d3-exploder` can be installed via `bower` or `npm`
+`d3-exploder` can be installed via `npm`
 
 ```
 npm install d3-exploder
 ```
 
-```
-bower install d3-exploder
-```
-
-
 ### Usage
 
-Include the script, or require in node and extend d3
-
-```html
-<script src="exploder.js"></script>
-```
 
 ```javascript
-var d3 = require('d3');
-require('./exploder.js')(d3);
-```
+import * as d3 from 'd3';
+import { exploder } from 'd3-exploder';
 
 
-Create an exploder function
 
-```javascript
-var exploder = d3.geo.exploder()
+// Create an exploder function
+var exploder = exploder()
                 .projection(d3.geo.albersUsa().scale(width))
                 .size(function(d, i) {
                   // function new size of features in pixels
@@ -49,11 +37,9 @@ var exploder = d3.geo.exploder()
                   // which specifies the position of
                   // the features in the svg
                 });
-```
 
-Call the exploder, optionally in a transition
+// Call exploder, optionally in a transition
 
-```javascript
 var width = 960,
     height = 500,
     centered;

@@ -1,10 +1,17 @@
 {
   "name": "d3-exploder",
-  "version": "1.0.5",
+  "version": "2.0.0",
   "description": "A tiny d3 extension which lets you turn your maps into other types of charts!",
-  "main": "exploder.js",
+  "main": "build/d3-exploder.js",
+  "jsnext:main": "index.js",
+  "module": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "rollup -f umd -n d3 -g d3-geo:d3 -o build/d3-exploder.js -- index.js",
+    "minify": "uglifyjs --preamble \"$(preamble)\" build/d3-exploder.js -c negate_iife=false -m -o build/d3-exploder.min.js"
+  },
+  "author": {
+    "name": "Ben Southgate",
+    "url": "http://bsou.io"
   },
   "repository": {
     "type": "git",
@@ -17,10 +24,18 @@
     "svg",
     "maps"
   ],
-  "author": "Ben Southgate",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/bsouthga/d3-exploder/issues"
   },
-  "homepage": "https://github.com/bsouthga/d3-exploder"
+  "homepage": "https://github.com/bsouthga/d3-exploder",
+  "dependencies": {
+    "d3-geo": "^1.4.0"
+  },
+  "devDependencies": {
+    "eslint": "^3.12.2",
+    "package-preamble": "^0.0.2",
+    "rollup": "^0.38.0",
+    "uglifyjs": "^2.4.10"
+  }
 }
