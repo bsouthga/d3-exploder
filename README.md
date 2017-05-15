@@ -8,7 +8,7 @@ A tiny d3 extension which lets you turn your maps into other types of charts!
 
 [See examples here](http://bsouthga.github.io/d3-exploder/)
 
-[Another example brought up by a user](http://jsfiddle.net/9Lpcm56n/2/)
+[Another example brought up by a user](https://jsfiddle.net/9Lpcm56n/16/)
 
 
 ### Installation
